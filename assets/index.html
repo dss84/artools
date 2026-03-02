@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artools Precision Pen</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS -->
+    <style>
+        /* TOKENS & VARIABLES */
+        :root {
+            /* Colors */
+            --bg-body: #ffffff;
+            --bg-surface: #fafafa;
+            --bg-surface-2: #f4f4f5;
+            --text-primary: #09090b;
+            --text-secondary: #71717a;
+            --text-tertiary: #a1a1aa;
+            --border-light: #e4e4e7;
+            --border-hover: #d4d4d8;
+            --brand-primary: #000000;
+            --brand-inverse: #ffffff;
+
+            /* Typography */
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            /* Motion */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* RESET & BASE */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.5;
+            cursor: none;
+            /* Custom cursor */
+        }
+
+        a,
+        button {
+            cursor: none;
+        }
+
+        /* CUSTOM CURSOR */
+        .cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 12px;
+            height: 12px;
+            background-color: var(--brand-primary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, background-color 0.3s, mix-blend-mode 0.3s;
+            will-change: transform;
+        }
+
+        .cursor.hovered {
+            width: 48px;
+            height: 48px;
+            background-color: rgba(0, 0, 0, 0.1);
+            mix-blend-mode: difference;
+            border: 1px solid var(--text-tertiary);
+        }
+
+        /* NAVBAR */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(24px, 6vw, 120px);
+            z-index: 50;
+            transition: all 0.3s var(--ease-out-expo);
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-logo svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .nav-links {
+            display: none;
+            gap: 32px;
+        }
+
+        @media (min-width: 768px) {
+            .nav-links {
+                display: flex;
+            }
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--brand-primary);
+        }
+
+        .nav-cart {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--border-light);
+            transition: border-color 0.3s;
+        }
+
+        .nav-cart:hover {
+            border-color: var(--brand-primary);
+        }
+
+        /* HERO SECTION */
+        .hero-section {
+            position: relative;
+            width: 100%;
+            height: 250vh;
+            /* Reduzido de 500vh para 250vh para tornar o evento rápido e confortável sem exigir muita rolagem */
+            background-color: var(--bg-body);
+        }
+
+        .hero-sticky-container {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            padding: 0 clamp(24px, 6vw, 120px);
+        }
+
+        /* VIDEO BACKGROUND */
+        .video-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            background: linear-gradient(135deg, #111 0%, #333 100%);
+            /* Fallback gradient */
+        }
+
+        .video-bg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            will-change: transform;
+        }
+
+        /* OVERLAY */
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.15);
+            /* Subtle overlay for text legibility */
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* MAIN CONTENT GRID */
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            padding-top: 80px;
+            /* Space for mobile navbar */
+        }
+
+        @media (min-width: 768px) {
+            .hero-content {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: 1fr;
+                align-items: center;
+                padding-top: 0;
+            }
+        }
+
+        /* LEFT COLUMN: TEXT */
+        .hero-text-col {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+            will-change: transform;
+        }
+
+        .headline {
+            font-size: clamp(32px, 8vw, 96px);
+            /* Refinado para o mobile para não vazar a borda */
+            font-weight: 800;
+            line-height: 0.95;
+            letter-spacing: -0.05em;
+            /* Tracking-tighter igual ao Design System */
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .headline-line {
+            display: block;
+            overflow: hidden;
+            /* For split type animation */
+            white-space: nowrap;
+            /* Previne a separação silábica indesejada limitando à uma linha */
+        }
+
+        .headline-1 {
+            color: var(--brand-primary);
+        }
+
+        .headline-2 {
+            font-weight: 300;
+            color: transparent;
+            -webkit-text-stroke: 1.5px rgba(0, 0, 0, 0.25);
+            /* Cinza fiel ao design-system */
+        }
+
+        .headline-3 {
+            color: var(--brand-primary);
+        }
+
+        .subtitle {
+            font-size: clamp(14px, 1.5vw, 18px);
+            color: var(--text-secondary);
+            max-width: 400px;
+            margin-bottom: 40px;
+            font-weight: 400;
+            opacity: 0;
+            /* Animated later */
+            transform: translateY(20px);
+        }
+
+        /* BUTTONS */
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            opacity: 0;
+            /* Animated later */
+        }
+
+        @media (max-width: 480px) {
+            .hero-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s var(--ease-out-expo);
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: #27272a;
+            /* Dark charcoal */
+            color: var(--brand-inverse);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--text-secondary);
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-light);
+            gap: 8px;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--text-primary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover .arrow-icon {
+            transform: translateY(3px);
+        }
+
+        .arrow-icon {
+            transition: transform 0.3s var(--ease-out-expo);
+        }
+
+        /* RIGHT COLUMN: PEN INDICATOR & SWIRL */
+        .hero-visual-col {
+            display: none;
+            /* Desativa decorativos complexos espaciais no mobile deitando tudo para o video central */
+        }
+
+        @media (min-width: 768px) {
+            .hero-visual-col {
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+            }
+        }
+
+        .visual-indicator {
+            position: absolute;
+            top: 20%;
+            right: 0;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transform-origin: right center;
+            transform: rotate(90deg);
+        }
+
+        .visual-indicator span {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+        }
+
+        .visual-indicator .line {
+            width: 40px;
+            height: 1px;
+            background-color: var(--border-light);
+        }
+
+        /* SCROLL INDICATOR */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            z-index: 20;
+            opacity: 0;
+            /* Animated later */
+        }
+
+        .scroll-indicator span {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--text-primary);
+        }
+
+        .scroll-mouse {
+            width: 20px;
+            height: 32px;
+            border: 1.5px solid var(--text-primary);
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .scroll-wheel {
+            width: 2px;
+            height: 6px;
+            background-color: var(--text-primary);
+            border-radius: 2px;
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: scrollBounce 1.5s infinite;
+        }
+
+        @keyframes scrollBounce {
+            0% {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+
+            50% {
+                transform: translate(-50%, 8px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translate(-50%, 0);
+                opacity: 0;
+            }
+        }
+
+        /* Char/Word animations setup */
+        .char {
+            transform: translateY(110%);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- CUSTOM CURSOR -->
+    <div class="cursor" id="custom-cursor"></div>
+
+    <!-- NAVBAR -->
+    <header class="navbar" id="navbar">
+        <div class="nav-logo">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M15.2322 5.23223L18.7678 8.76777M16.7322 3.73223C17.7085 2.75592 19.2915 2.75592 20.2678 3.73223C21.2441 4.70854 21.2441 6.29146 20.2678 7.26777L6.5 21H3V17.5L16.7322 3.73223Z"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            ARTOOLS.PRO
+        </div>
+        <nav class="nav-links">
+            <a href="#design" class="hover-target">Design</a>
+            <a href="#technology" class="hover-target">Technology</a>
+            <a href="#specs" class="hover-target">Specs</a>
+        </nav>
+        <a href="#cart" class="nav-cart hover-target">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+        </a>
+    </header>
+
+    <!-- MAIN HERO SECTION -->
+    <main>
+        <section class="hero-section" id="hero-section">
+            <div class="hero-sticky-container">
+
+                <!-- VIDEO BACKGROUND -->
+                <div class="video-container">
+                    <!-- Relative path to video as requested -->
+                    <video id="hero-video" class="video-bg" preload="auto" muted playsinline disablePictureInPicture>
+                        <source src="./raw_files/video2.mp4" type="video/mp4">
+                    </video>
+                    <div class="video-overlay"></div>
+                </div>
+
+                <!-- CONTENT WRAPPER -->
+                <div class="hero-content">
+
+                    <!-- LEFT COL -->
+                    <div class="hero-text-col" id="hero-text-parallax">
+                        <h1 class="headline" id="headline">
+                            <span class="headline-line headline-1" id="line-1">A caneta</span>
+                            <span class="headline-line headline-2" id="line-2">mais tecnológica</span>
+                            <span class="headline-line headline-3" id="line-3">do mundo.</span>
+                        </h1>
+
+                        <p class="subtitle" id="subtitle">
+                            A Artools Precision Pen redefine o equilíbrio entre peso, fluxo e design. Feita para
+                            criadores que exigem perfeição em cada traço.
+                        </p>
+
+                        <div class="hero-buttons" id="hero-buttons">
+                            <button class="btn btn-primary hover-target">Comprar Agora</button>
+                            <button class="btn btn-secondary hover-target">
+                                Explorar
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <polyline points="19 12 12 19 5 12"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COL -->
+                    <div class="hero-visual-col">
+                        <!-- Visual Indicator -->
+                        <div class="visual-indicator" id="indicator">
+                            <span>01</span>
+                            <div class="line"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- SCROLL INDICATOR -->
+                <div class="scroll-indicator" id="scroll-indicator">
+                    <div class="scroll-mouse">
+                        <div class="scroll-wheel"></div>
+                    </div>
+                    <span>Scroll to Control</span>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/split-type@0.3.4/umd/index.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            // 1. REGISTER GSAP & LENIS
+            gsap.registerPlugin(ScrollTrigger);
+
+            const lenis = new Lenis({
+                duration: 1.2,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                smooth: true,
+            });
+
+            lenis.on('scroll', ScrollTrigger.update);
+            gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+            gsap.ticker.lagSmoothing(0);
+
+            // 2. VIDEO SCROLL LOGIC: FRAME-DROPPING & THROTTLING DA PLACA DE VÍDEO
+            // A verdadeira origem do travamento em mídias MP4 (compressão H.264) reside no fato de que 
+            // pedir para o browser pular "de volta" ou "aleatoriamente" em sub-frames (ex: 2.1345 segundos) 
+            // trava a engine pois ele não acha keyframes exatos e trava na decodificação.
+            // Solução: Um Controlador Restritivo que converte pra FPS, e NUNCA pede um frame se o 
+            // navegador estiver ocupado pensando no frame anterior.
+
+            const video = document.getElementById('hero-video');
+            let isVideoInit = false;
+
+            // Variáveis de proteção térmica do CPU/GPU
+            let isSeeking = false;
+            let targetRawTime = 0;
+            const VIDEO_FPS = 30; // 30 quadros por segundo padrão
+
+            // Avisa o JavaScript que a placa de vídeo terminou de decodificar e desenhar o frame na tela
+            video.addEventListener('seeked', () => {
+                isSeeking = false;
+            });
+
+            async function loadVideoToRAM() {
+                try {
+                    const response = await fetch("./raw_files/video2.mp4");
+                    const blob = await response.blob();
+                    const blobURL = URL.createObjectURL(blob);
+                    video.src = blobURL;
+                    video.addEventListener('loadedmetadata', initVideoTimeline);
+                } catch (err) {
+                    console.error("Erro no preload. Fallback ativado.");
+                    initVideoTimeline();
+                }
+            }
+
+            function initVideoTimeline() {
+                if (isVideoInit) return;
+                isVideoInit = true;
+
+                // Força o pause do player
+                video.pause();
+                if (video.currentTime === 0) video.currentTime = 0.001;
+
+                // Lenis e GSAP ditam o PROGRESSO matematicamente, MAS NÃO TOCAM no vídeo diretamente
+                ScrollTrigger.create({
+                    trigger: "#hero-section",
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: true,
+                    onUpdate: (self) => {
+                        let duration = video.duration || 10;
+                        targetRawTime = self.progress * duration;
+                    }
+                });
+
+                // LOOP MILITAR: O Render Queue Passivo
+                function renderLoop() {
+                    // Condição Ouro: Apenas pular para um frame se nós NÃO estamos engasgados no anterior, 
+                    // e se o pulo for considerável (pelo menos 1 frame real do MP4).
+                    if (!isSeeking && Math.abs(targetRawTime - video.currentTime) >= (1 / VIDEO_FPS)) {
+
+                        // Arredonda a fraçao temporal estrita para bater no frame gravado no MP4
+                        let snapTargetTime = Math.round(targetRawTime * VIDEO_FPS) / VIDEO_FPS;
+
+                        isSeeking = true; // Tranca a porta pra evitar Gargalos da GPU (Pipelines Stalls)
+                        video.currentTime = snapTargetTime;
+                    }
+                    requestAnimationFrame(renderLoop);
+                }
+
+                requestAnimationFrame(renderLoop); // Inicia a escuta passiva de hardware
+            }
+
+            // Invoca a super otimização logo de cara
+            loadVideoToRAM();
+
+            // 3. NAVBAR SCROLL EFFECT
+            window.addEventListener('scroll', () => {
+                const navbar = document.getElementById('navbar');
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+
+            // 4. CUSTOM CURSOR
+            const cursor = document.getElementById('custom-cursor');
+            const hoverTargets = document.querySelectorAll('.hover-target, button, a');
+
+            // Smooth cursor follow
+            let mouseX = 0, mouseY = 0;
+            let cursorX = 0, cursorY = 0;
+
+            window.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            gsap.ticker.add(() => {
+                // Lerp formula for smooth trailing
+                cursorX += (mouseX - cursorX) * 0.2;
+                cursorY += (mouseY - cursorY) * 0.2;
+
+                cursor.style.transform = `translate(${cursorX}px, ${cursorY}px) translate(-50%, -50%)`;
+            });
+
+            hoverTargets.forEach(target => {
+                target.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+                target.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+            });
+
+            // 5. LOAD ANIMATIONS
+
+            // Split text for staggered reveal
+            const splitLines = new SplitType('.headline-line', { types: 'chars' });
+
+            const tl = gsap.timeline();
+
+            // Setup initial states
+            gsap.set('.navbar', { y: -20, opacity: 0 });
+            gsap.set(splitLines.chars, { y: 110 });
+            gsap.set('#subtitle', { y: 20, opacity: 0 });
+            gsap.set('#hero-buttons', { scale: 0.9, opacity: 0 });
+            gsap.set('#scroll-indicator', { opacity: 0 });
+
+            // Execute animations
+            tl.to('.navbar', {
+                y: 0,
+                opacity: 1,
+                duration: 0.8,
+                ease: 'power3.out'
+            }, 0)
+
+                .to(splitLines.chars, {
+                    y: 0,
+                    stagger: 0.02,
+                    duration: 0.8,
+                    ease: 'power4.out'
+                }, 0.3)
+
+                .to('#subtitle', {
+                    y: 0,
+                    opacity: 1,
+                    duration: 0.8,
+                    ease: 'power3.out'
+                }, 0.8)
+
+                .to('#hero-buttons', {
+                    scale: 1,
+                    opacity: 1,
+                    duration: 0.6,
+                    ease: 'back.out(1.5)'
+                }, 1.0)
+
+                .to('#scroll-indicator', {
+                    opacity: 1,
+                    duration: 1,
+                    ease: 'power2.out'
+                }, 1.5);
+
+            // 6. TEXT PARALLAX DURING SCROLL
+            gsap.to('#hero-text-parallax', {
+                y: -100, // moves slightly up as you scroll down
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: "#hero-section",
+                    start: "top top",
+                    end: "bottom top", // section height is 500vh
+                    scrub: true
+                }
+            });
+
+        });
+    </script>
+</body>
+
+</html>

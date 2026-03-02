@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Design System V 14.0</title>
+
+    <!-- FIX: Correct relative paths to the assets inside the templates folder -->
+    <script src="templates/digital-architect.aura.build/assets/resource_3fa48481346f.js"></script>
+    <script src="templates/digital-architect.aura.build/assets/iconify-icon_d39ffc6e4c56.js"></script>
+    <link href="templates/digital-architect.aura.build/assets/css2_19fd9cc6b396.css" rel="stylesheet" />
+
+    <style>
+        :root {
+            /* Palette Generation */
+            --primary: #FFFFFF;
+            --primary-rgb: 255, 255, 255;
+            --secondary: #FAFAFA;
+            --accent: #E1E1E1;
+            --text-main: #1C1C1C;
+            --text-muted: #737373;
+            --text-light: #A3A3A3;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary);
+            color: var(--text-main);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Base Reveal Animation (Scroll triggered) */
+        .reveal {
+            opacity: 0;
+            transform: translateY(3rem) scale(0.98);
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Transparent Lettering */
+        .text-reveal-wrapper {
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: bottom;
+            position: relative;
+        }
+
+        .text-reveal-content {
+            transform: translateY(110%);
+            opacity: 0;
+            transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.2s ease;
+            display: block;
+        }
+
+        .transparent-lettering {
+            background-image: url('templates/digital-architect.aura.build/assets/c7fa69dd-d7fb-48f2-a866-ef3663_f6b789593f38.webp');
+            background-size: cover;
+            background-position: center;
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            -webkit-text-fill-color: transparent;
+            /* Optional: Add a subtle stroke if contrast is needed */
+            -webkit-text-stroke: 1px rgba(0, 0, 0, 0.05);
+        }
+
+        .reveal-active .text-reveal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Stagger Delays */
+        .delay-100 {
+            transition-delay: 0.1s;
+        }
+
+        .delay-200 {
+            transition-delay: 0.2s;
+        }
+
+        .delay-300 {
+            transition-delay: 0.3s;
+        }
+
+        .delay-400 {
+            transition-delay: 0.4s;
+        }
+
+        .delay-500 {
+            transition-delay: 0.5s;
+        }
+
+        .delay-700 {
+            transition-delay: 0.7s;
+        }
+
+        /* Carousel Fade */
+        .carousel-slide {
+            position: absolute;
+            inset: 0;
+            transition: opacity 1.5s ease-in-out;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+        }
+
+        .carousel-slide img {
+            transform: scale(1);
+            transition: transform 10s ease-out;
+        }
+
+        .carousel-slide.active img {
+            transform: scale(1.1);
+        }
+
+        /* Marquee Animation */
+        @keyframes marquee {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        .marquee-container {
+            display: flex;
+            overflow: hidden;
+            user-select: none;
+            width: 100%;
+        }
+
+        .marquee-content {
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-around;
+            min-width: 100%;
+            animation: marquee 30s linear infinite;
+        }
+
+        /* Nav Load */
+        .nav-load {
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.8s ease-out;
+        }
+
+        .nav-load.loaded {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Visual Fixes */
+        iconify-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+        }
+
+        .parallax-element {
+            will-change: transform;
+            transition: transform 0.1s linear;
+        }
+
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.03);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease;
+        }
+
+        .glass-panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 40px 60px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Beam / Shimmer Animation for Buttons */
+        @keyframes shimmer {
+            from {
+                transform: translateX(-100%) skewX(-15deg);
+            }
+
+            to {
+                transform: translateX(200%) skewX(-15deg);
+            }
+        }
+
+        .btn-shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-shimmer::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transform: skewX(-15deg);
+            animation: shimmer 2.5s infinite;
+        }
+
+        /* Flashlight Effect */
+        .flashlight-card {
+            position: relative;
+            overflow: hidden;
+            background: #FAFAFA;
+            border: 1px solid #EAEAE5;
+        }
+
+        .flashlight-card::before {
+            content: "";
+            position: absolute;
+            inset: 0px;
+            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(0, 0, 0, 0.05), transparent 40%);
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .flashlight-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Floating Blobs (Abstract background for hero) */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+            }
+
+            50% {
+                transform: translateY(-20px) scale(1.05);
+            }
+        }
+
+        .blob {
+            position: absolute;
+            filter: blur(60px);
+            z-index: 0;
+            border-radius: 50%;
+            animation: float 10s ease-in-out infinite;
+        }
+
+        /* Modal specific */
+        .modal-overlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            transform: scale(0.95) translateY(20px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.open .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Tooltip */
+        .tooltip-container {
+            position: relative;
+        }
+
+        .tooltip-box {
+            position: absolute;
+            bottom: 150%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .tooltip-container:hover .tooltip-box {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-stone-900 selection:text-white relative bg-[#FFFFFF]">
+
+    <!-- Background Decoration for the Page -->
+    <div class="fixed top-0 left-0 w-full h-[50vh] bg-gradient-to-b from-stone-50 to-white -z-10 pointer-events-none">
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="fixed top-0 w-full z-50 border-b border-stone-200 bg-white/80 backdrop-blur-xl nav-load">
+        <div class="max-w-[1400px] mx-auto flex justify-between items-center px-6 md:px-12 py-5">
+            <div class="flex items-center gap-8">
+                <a class="text-xs font-semibold tracking-widest uppercase hover:text-stone-500 transition-colors"
+                    href="#hero">Overview</a>
+                <a class="text-xs font-semibold tracking-widest uppercase hover:text-stone-500 transition-colors"
+                    href="#typography">Typography</a>
+                <a class="text-xs font-semibold tracking-widest uppercase hidden md:block hover:text-stone-500 transition-colors"
+                    href="#colors">Colors</a>
+            </div>
+            <div class="flex items-center gap-2 group cursor-pointer absolute left-1/2 -translate-x-1/2">
+                <iconify-icon class="text-2xl text-stone-900 group-hover:rotate-180 transition-transform duration-700"
+                    icon="solar:infinity-line-duotone"></iconify-icon>
+                <span class="font-bold tracking-tighter text-xl text-stone-900">SYS.14</span>
+            </div>
+            <div class="flex items-center gap-8">
+                <a class="text-xs font-semibold tracking-widest uppercase hidden md:block hover:text-stone-500 transition-colors"
+                    href="#components">Components</a>
+                <a class="text-xs font-semibold tracking-widest uppercase hover:text-stone-500 transition-colors"
+                    href="#motion">Motion</a>
+                <a class="text-xs font-semibold tracking-widest uppercase hover:text-stone-500 transition-colors"
+                    href="#icons">Icons</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 1) PRIMEIRA DOBRA (HERO) -->
+    <section id="hero"
+        class="relative z-10 min-h-screen flex flex-col justify-center overflow-hidden border-b border-stone-200 pt-20">
+
+        <!-- Animated Blobs behind -->
+        <div class="blob w-[500px] h-[500px] bg-stone-100 top-[10%] left-[-10%] opacity-80"></div>
+        <div class="blob w-[600px] h-[600px] bg-stone-50 bottom-[-20%] right-[-10%] opacity-80"
+            style="animation-delay: 2s;"></div>
+
+        <!-- Carousel Background (Very low opacity) -->
+        <div class="absolute inset-0 z-0 pointer-events-none opacity-[0.03]">
+            <div class="carousel-slide active w-full h-full" id="hero-carousel">
+                <img class="w-full h-full object-cover grayscale parallax-img" data-speed="0.05"
+                    src="templates/digital-architect.aura.build/assets/c7fa69dd-d7fb-48f2-a866-ef3663_f6b789593f38.webp" />
+            </div>
+        </div>
+
+        <div
+            class="max-w-[1400px] mx-auto w-full px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-20">
+            <!-- Left Text Content -->
+            <div class="col-span-1 lg:col-span-7">
+                <div
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-stone-50 border border-stone-200 rounded-full mb-8 reveal shadow-sm text-stone-600">
+                    <span class="w-2 h-2 rounded-full bg-stone-900 animate-pulse"></span>
+                    <span class="text-xs font-mono uppercase tracking-widest font-semibold">The Complete System</span>
+                </div>
+
+                <h1 class="text-[5rem] md:text-[8rem] lg:text-[10rem] font-bold tracking-tighter leading-[0.85] text-stone-900 mb-8"
+                    id="hero-title">
+                    <span class="text-reveal-wrapper">
+                        <span class="text-reveal-content delay-200 text-stone-900">Beyond</span>
+                    </span><br />
+                    <span class="text-reveal-wrapper">
+                        <!-- TRANSPARENT LETTERING -->
+                        <span class="text-reveal-content delay-300 transparent-lettering">Design</span>
+                    </span><br />
+                    <span class="text-reveal-wrapper">
+                        <span class="text-reveal-content delay-400 text-stone-900">System.</span>
+                    </span>
+                </h1>
+
+                <p
+                    class="text-lg md:text-2xl text-stone-500 max-w-xl mb-12 reveal delay-500 leading-relaxed font-light">
+                    Elevando a arquitetura visual. Focado na cor branca, micro-interações fluidas e tipografia arrojada.
+                    O balanço perfeito entre arte e função.
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-center gap-6 reveal delay-700">
+                    <a href="#components"
+                        class="w-full sm:w-auto px-10 py-5 bg-stone-900 text-white rounded-full text-sm font-bold tracking-wide uppercase hover:bg-stone-800 transition-all btn-shimmer group shadow-xl">
+                        View Components
+                        <iconify-icon icon="solar:arrow-right-line-duotone"
+                            class="text-xl ml-2 group-hover:translate-x-1 transition-transform inline-block align-middle"></iconify-icon>
+                    </a>
+                    <a href="#typography"
+                        class="w-full sm:w-auto px-10 py-5 bg-white border border-stone-200 text-stone-900 rounded-full text-sm font-bold tracking-wide uppercase hover:bg-stone-50 hover:border-stone-400 transition-all shadow-sm">
+                        Read Guidelines
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Visual Graphic -->
+            <div class="hidden lg:block col-span-5 h-full relative reveal delay-500">
+                <!-- Floating Glass Panel -->
+                <div
+                    class="glass-panel absolute top-[15%] right-0 w-[350px] p-8 rounded-[2rem] z-30 flex flex-col justify-between">
+                    <div class="flex justify-between items-start mb-12">
+                        <iconify-icon icon="solar:magic-stick-3-line-duotone"
+                            class="text-4xl text-stone-800"></iconify-icon>
+                        <span
+                            class="px-3 py-1 bg-white border border-stone-100 rounded-full text-[10px] font-mono tracking-widest text-stone-500 uppercase shadow-sm">Core
+                            Active</span>
+                    </div>
+                    <div>
+                        <div class="w-full bg-stone-100 rounded-full h-1.5 mb-4 overflow-hidden">
+                            <div class="bg-stone-900 h-full rounded-full w-[80%] animate-pulse"></div>
+                        </div>
+                        <h4 class="text-2xl font-bold text-stone-900 tracking-tight">System Status</h4>
+                        <p class="text-sm text-stone-500 mt-2 font-light">Os componentes vitais do Design System 14.0
+                            operando em estabilidade impecável.</p>
+                    </div>
+                </div>
+
+                <!-- Dark accent card behind -->
+                <div
+                    class="absolute bottom-[20%] left-[-10%] w-[300px] bg-stone-900 text-white p-6 rounded-2xl z-20 shadow-2xl hover:scale-105 transition-transform duration-500">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-12 h-12 rounded-full bg-stone-800 flex items-center justify-center">
+                            <iconify-icon icon="solar:shield-check-line-duotone"
+                                class="text-2xl text-stone-300"></iconify-icon>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm">Security Layer</h4>
+                            <p class="text-xs text-stone-400">100% Encrypted UI</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 mt-4 text-xs font-mono text-stone-500">
+                        <iconify-icon icon="solar:refresh-circle-bold" class="animate-spin"></iconify-icon> Syncing
+                        resources...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Marquee Infinite Indicator -->
+        <div class="absolute bottom-0 w-full border-t border-stone-200 bg-white/40 backdrop-blur-md z-40 py-4">
+            <div class="marquee-container">
+                <div class="marquee-content inline-flex whitespace-nowrap">
+                    <span
+                        class="text-xs font-mono uppercase tracking-widest text-stone-500 mx-8 flex items-center gap-2"><iconify-icon
+                            icon="solar:check-circle-linear" class="text-stone-900"></iconify-icon> Fully White
+                        Approach</span>
+                    <span
+                        class="text-xs font-mono uppercase tracking-widest text-stone-500 mx-8 flex items-center gap-2"><iconify-icon
+                            icon="solar:check-circle-linear" class="text-stone-900"></iconify-icon> Premium
+                        Typography</span>
+                    <span
+                        class="text-xs font-mono uppercase tracking-widest text-stone-500 mx-8 flex items-center gap-2"><iconify-icon
+                            icon="solar:check-circle-linear" class="text-stone-900"></iconify-icon> Interactive
+                        Motion</span>
+                    <span
+                        class="text-xs font-mono uppercase tracking-widest text-stone-500 mx-8 flex items-center gap-2"><iconify-icon
+                            icon="solar:check-circle-linear" class="text-stone-900"></iconify-icon> Flashlight
+                        Hover</span>
+                    <span
+                        class="text-xs font-mono uppercase tracking-widest text-stone-500 mx-8 flex items-center gap-2"><iconify-icon
+                            icon="solar:check-circle-linear" class="text-stone-900"></iconify-icon> Out-of-the-box
+                        UI</span>
+                </div>
+                <!-- Duplicate for infinite loop -->
+                <div class="marquee-content inline-flex whitespace-nowrap">
+                    <span
+                        class="text-xs font-mono uppercase tracking-widest text-stone-500 mx-8 flex items-center gap-2"><iconify-icon
+                            icon="solar:check-circle-linear" class="text-stone-900"></iconify-icon> Fully White
+                        Approach</span>
+                    <span
+                        class="text-xs font-mono uppercase tracking-widest text-stone-500 mx-8 flex items-center gap-2"><iconify-icon
+                            icon="solar:check-circle-linear" class="text-stone-900"></iconify-icon> Premium
+                        Typography</span>
+                    <span
+                        class="text-xs font-mono uppercase tracking-widest text-stone-500 mx-8 flex items-center gap-2"><iconify-icon
+                            icon="solar:check-circle-linear" class="text-stone-900"></iconify-icon> Interactive
+                        Motion</span>
+                    <span
+                        class="text-xs font-mono uppercase tracking-widest text-stone-500 mx-8 flex items-center gap-2"><iconify-icon
+                            icon="solar:check-circle-linear" class="text-stone-900"></iconify-icon> Flashlight
+                        Hover</span>
+                    <span
+                        class="text-xs font-mono uppercase tracking-widest text-stone-500 mx-8 flex items-center gap-2"><iconify-icon
+                            icon="solar:check-circle-linear" class="text-stone-900"></iconify-icon> Out-of-the-box
+                        UI</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Content Wrapper for Grid -->
+    <div class="max-w-[1400px] mx-auto relative border-x border-stone-200 bg-white">
+
+        <!-- 2) TYPOGRAPHY -->
+        <section id="typography" class="border-b border-stone-200">
+            <div class="p-8 md:p-16 border-b border-stone-100 bg-stone-50/50 reveal">
+                <span
+                    class="text-xs font-mono uppercase text-stone-400 block mb-3 font-semibold tracking-wider">Foundation
+                    01</span>
+                <h2 class="text-5xl md:text-6xl font-bold tracking-tight text-stone-900">Typography System</h2>
+                <div class="mt-6 flex flex-col md:flex-row gap-8">
+                    <div class="bg-white border border-stone-200 p-6 rounded-xl flex-1 shadow-sm">
+                        <p class="text-[10px] uppercase font-mono text-stone-400 mb-2">Primary Font</p>
+                        <p class="text-xl font-bold text-stone-900 break-words">'Inter', sans-serif</p>
+                    </div>
+                    <div class="bg-white border border-stone-200 p-6 rounded-xl flex-1 shadow-sm">
+                        <p class="text-[10px] uppercase font-mono text-stone-400 mb-2">Fallback Stack</p>
+                        <p class="text-sm font-mono text-stone-600 leading-relaxed">system-ui, -apple-system,
+                            BlinkMacSystemFont, "Segoe UI"</p>
+                    </div>
+                    <div class="bg-white border border-stone-200 p-6 rounded-xl flex-1 shadow-sm">
+                        <p class="text-[10px] uppercase font-mono text-stone-400 mb-2">Loading Strategy</p>
+                        <p class="text-sm text-stone-600">Google Fonts CDN. Weights: <span class="font-bold">300, 400,
+                                500, 600, 700, 900</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 divide-y divide-stone-100">
+                <!-- H1 -->
+                <div
+                    class="grid grid-cols-1 md:grid-cols-12 p-8 md:p-16 items-center reveal delay-100 hover:bg-stone-50 transition-colors">
+                    <div class="col-span-3">
+                        <div class="text-[10px] font-mono text-stone-400 uppercase tracking-widest">H1 / Display</div>
+                        <div class="text-[10px] font-mono text-stone-400 mt-2 flex flex-col gap-1">
+                            <span>Size: 72px - 96px</span>
+                            <span>Weight: 800 (Bold)</span>
+                            <span>Line: 0.85 - 1.0</span>
+                            <span>Letter: -0.05em</span>
+                        </div>
+                    </div>
+                    <div class="col-span-9">
+                        <h1 class="text-6xl md:text-8xl font-bold tracking-tighter leading-none text-stone-900">Heroic
+                            Title</h1>
+                    </div>
+                </div>
+
+                <!-- H2 -->
+                <div
+                    class="grid grid-cols-1 md:grid-cols-12 p-8 md:p-16 items-center reveal delay-200 hover:bg-stone-50 transition-colors">
+                    <div class="col-span-3">
+                        <div class="text-[10px] font-mono text-stone-400 uppercase tracking-widest">H2 / Section Title
+                        </div>
+                        <div class="text-[10px] font-mono text-stone-400 mt-2 flex flex-col gap-1">
+                            <span>Size: 48px - 64px</span>
+                            <span>Weight: 700 (Bold)</span>
+                            <span>Line: 1.1</span>
+                            <span>Letter: -0.02em</span>
+                        </div>
+                    </div>
+                    <div class="col-span-9">
+                        <h2 class="text-5xl md:text-6xl font-bold tracking-tight text-stone-900">Section Header</h2>
+                    </div>
+                </div>
+
+                <!-- H3 -->
+                <div
+                    class="grid grid-cols-1 md:grid-cols-12 p-8 md:p-16 items-center reveal delay-300 hover:bg-stone-50 transition-colors">
+                    <div class="col-span-3">
+                        <div class="text-[10px] font-mono text-stone-400 uppercase tracking-widest">H3 / Subtitle</div>
+                        <div class="text-[10px] font-mono text-stone-400 mt-2 flex flex-col gap-1">
+                            <span>Size: 32px - 40px</span>
+                            <span>Weight: 600 (Semibold)</span>
+                            <span>Line: 1.2</span>
+                            <span>Letter: -0.01em</span>
+                        </div>
+                    </div>
+                    <div class="col-span-9">
+                        <h3 class="text-3xl md:text-4xl font-semibold tracking-tight text-stone-900">Important Subtitle
+                        </h3>
+                    </div>
+                </div>
+
+                <!-- Body Text -->
+                <div
+                    class="grid grid-cols-1 md:grid-cols-12 p-8 md:p-16 items-start reveal delay-400 hover:bg-stone-50 transition-colors">
+                    <div class="col-span-3 pt-2">
+                        <div class="text-[10px] font-mono text-stone-400 uppercase tracking-widest">Body Styles</div>
+                    </div>
+                    <div class="col-span-9 space-y-8">
+                        <div>
+                            <span class="text-xs font-mono mb-2 block text-stone-400">Body Large (1.125rem / 400)</span>
+                            <p class="text-lg md:text-xl leading-relaxed text-stone-700 font-light">Este texto é ideal
+                                para introduções longas ou descrições no hero. Garante conforto visual para leitura
+                                estendida com line-height generoso e peso leve.</p>
+                        </div>
+                        <div>
+                            <span class="text-xs font-mono mb-2 block text-stone-400">Body Normal (1rem / 400)</span>
+                            <p class="text-base leading-relaxed text-stone-600">O parágrafo padrão usado na maior parte
+                                da interface, como cards, modais e descritivos gerais. Contrastes equilibrados evitam o
+                                cansaço visual.</p>
+                        </div>
+                        <div>
+                            <span class="text-xs font-mono mb-2 block text-stone-400">Body Small / Caption (0.875rem /
+                                400)</span>
+                            <p class="text-sm leading-relaxed text-stone-500">Texto pequeno focado em dicas, avisos
+                                (helpers) abaixo de inputs, ou rodapés e metadados secundários da página.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3) COLORS -->
+        <section id="colors" class="border-b border-stone-200">
+            <div class="p-8 md:p-16 border-b border-stone-100 bg-stone-50/50 reveal">
+                <span
+                    class="text-xs font-mono uppercase text-stone-400 block mb-3 font-semibold tracking-wider">Foundation
+                    02</span>
+                <h2 class="text-5xl md:text-6xl font-bold tracking-tight text-stone-900">Color System</h2>
+                <p class="text-stone-500 max-w-2xl mt-4 text-sm leading-relaxed">
+                    Arquitetura de cor focada primeiramente no branco e tons pasteis acinzentados (neutrals). Tons vivos
+                    e degradês atuam unicamente em estados semânticos e feedbacks importantes.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 border-b border-stone-200">
+                <!-- White -->
+                <div
+                    class="col-span-2 md:col-span-2 lg:col-span-1 p-8 border-b lg:border-b-0 border-r border-stone-200 bg-white flex flex-col justify-between aspect-square reveal hover:shadow-2xl hover:z-10 transition-shadow">
+                    <div>
+                        <div class="text-stone-900 font-bold mb-1">Primary Base</div>
+                        <div class="text-[10px] font-mono text-stone-400 uppercase tracking-widest">Background / Surface
+                        </div>
+                    </div>
+                    <div class="mt-6 flex flex-col gap-[2px]">
+                        <div class="font-mono text-xs text-stone-500">HEX #FFFFFF</div>
+                        <div class="font-mono text-[10px] text-stone-400">RGB 255 255 255</div>
+                        <div class="font-mono text-[10px] text-stone-400">HSL 0 0% 100%</div>
+                    </div>
+                </div>
+                <!-- Stone 50 -->
+                <div
+                    class="col-span-2 md:col-span-2 lg:col-span-1 p-8 border-b lg:border-b-0 lg:border-r border-stone-200 bg-stone-50 flex flex-col justify-between aspect-square reveal delay-100 hover:shadow-2xl hover:z-10 transition-shadow">
+                    <div>
+                        <div class="text-stone-900 font-bold mb-1">Secondary</div>
+                        <div class="text-[10px] font-mono text-stone-400 uppercase tracking-widest">Hover / Input BG
+                        </div>
+                    </div>
+                    <div class="mt-6 flex flex-col gap-[2px]">
+                        <div class="font-mono text-xs text-stone-500">HEX #FAFAFA</div>
+                        <div class="font-mono text-[10px] text-stone-400">RGB 250 250 250</div>
+                    </div>
+                </div>
+                <!-- Stone 200 -->
+                <div
+                    class="col-span-2 md:col-span-2 lg:col-span-1 p-8 border-b md:border-b-0 border-r border-stone-200 bg-stone-200 flex flex-col justify-between aspect-square reveal delay-200 hover:shadow-2xl hover:z-10 transition-shadow">
+                    <div>
+                        <div class="text-stone-900 font-bold mb-1">Outline</div>
+                        <div class="text-[10px] font-mono text-stone-500 uppercase tracking-widest">Borders / Dividers
+                        </div>
+                    </div>
+                    <div class="mt-6 flex flex-col gap-[2px]">
+                        <div class="font-mono text-xs text-stone-600">HEX #E5E5E5</div>
+                    </div>
+                </div>
+                <!-- Stone 500 -->
+                <div
+                    class="col-span-2 md:col-span-2 lg:col-span-1 p-8 border-b md:border-b-0 lg:border-r border-stone-200 bg-stone-500 flex flex-col justify-between aspect-square reveal delay-300 hover:shadow-2xl hover:z-10 transition-shadow text-white">
+                    <div>
+                        <div class="font-bold mb-1">Muted</div>
+                        <div class="text-[10px] font-mono text-stone-300 uppercase tracking-widest">Helper Text / Icons
+                        </div>
+                    </div>
+                    <div class="mt-6 flex flex-col gap-[2px]">
+                        <div class="font-mono text-xs text-stone-200">HEX #737373</div>
+                    </div>
+                </div>
+                <!-- Stone 900 -->
+                <div
+                    class="col-span-2 md:col-span-2 lg:col-span-1 p-8 border-r border-stone-200 bg-stone-900 flex flex-col justify-between aspect-square reveal delay-400 hover:shadow-2xl hover:z-10 transition-shadow text-white">
+                    <div>
+                        <div class="font-bold mb-1">Dark Accent</div>
+                        <div class="text-[10px] font-mono text-stone-400 uppercase tracking-widest">Primary Text / BTNs
+                        </div>
+                    </div>
+                    <div class="mt-6 flex flex-col gap-[2px]">
+                        <div class="font-mono text-xs text-stone-300">HEX #1C1C1C</div>
+                        <div class="font-mono text-[10px] text-stone-400">RGB 28 28 28</div>
+                    </div>
+                </div>
+                <!-- Semantic / Accent Gradient -->
+                <div
+                    class="col-span-2 md:col-span-2 lg:col-span-1 p-8 bg-gradient-to-br from-indigo-500 via-blue-600 to-indigo-800 flex flex-col justify-between aspect-square reveal delay-500 hover:shadow-2xl hover:z-10 transition-shadow text-white shadow-inner">
+                    <div>
+                        <div class="font-bold mb-1">Glow Focus</div>
+                        <div class="text-[10px] font-mono text-blue-200 uppercase tracking-widest">Highlights / Active
+                        </div>
+                    </div>
+                    <div class="mt-6 flex flex-col gap-[2px]">
+                        <div class="font-mono text-xs text-white">Linear Gradient</div>
+                        <div class="font-mono text-[10px] text-blue-200">135deg</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4) COMPONENTS & FORMS -->
+        <section id="components" class="border-b border-stone-200 bg-stone-50/50">
+            <div class="p-8 md:p-16 border-b border-stone-200 bg-white reveal">
+                <span
+                    class="text-xs font-mono uppercase text-stone-400 block mb-3 font-semibold tracking-wider">Interface
+                    03</span>
+                <h2 class="text-5xl md:text-6xl font-bold tracking-tight text-stone-900">UI Components</h2>
+            </div>
+
+            <!-- 2-col content -->
+            <div class="grid grid-cols-1 lg:grid-cols-2">
+                <!-- Buttons -->
+                <div class="p-8 md:p-16 border-b lg:border-b-0 lg:border-r border-stone-200">
+                    <h3
+                        class="text-sm font-mono font-bold uppercase tracking-widest text-stone-900 mb-10 border-b border-stone-200 pb-4 reveal">
+                        Actions & Buttons</h3>
+
+                    <div class="space-y-10">
+                        <!-- Primary Beam -->
+                        <div
+                            class="reveal delay-100 flex flex-col md:flex-row items-baseline md:items-center justify-between gap-4">
+                            <span class="text-xs font-mono text-stone-400 uppercase">Primary Shimmer</span>
+                            <button
+                                class="btn-shimmer px-8 py-3.5 bg-stone-900 text-white rounded-full text-sm font-semibold hover:bg-stone-800 transition-all flex items-center gap-2 group shadow-xl">
+                                Confirmar Ação
+                                <iconify-icon class="text-lg group-hover:translate-x-1 transition-transform"
+                                    icon="solar:arrow-right-line-duotone"></iconify-icon>
+                            </button>
+                        </div>
+
+                        <!-- Outline -->
+                        <div
+                            class="reveal delay-200 flex flex-col md:flex-row items-baseline md:items-center justify-between gap-4">
+                            <span class="text-xs font-mono text-stone-400 uppercase">Secondary Outline</span>
+                            <button
+                                class="px-8 py-3.5 bg-white border border-stone-300 text-stone-900 rounded-full text-sm font-semibold hover:bg-stone-50 hover:border-stone-900 transition-all flex items-center gap-2 group shadow-sm">
+                                <iconify-icon class="text-lg group-hover:-translate-y-1 transition-transform"
+                                    icon="solar:download-square-line-duotone"></iconify-icon>
+                                Fazer Download
+                            </button>
+                        </div>
+
+                        <!-- Ghost -->
+                        <div
+                            class="reveal delay-300 flex flex-col md:flex-row items-baseline md:items-center justify-between gap-4">
+                            <span class="text-xs font-mono text-stone-400 uppercase">Ghost / Inline Link</span>
+                            <a href="#"
+                                class="inline-flex items-center gap-2 text-sm font-medium text-stone-600 hover:text-stone-900 border-b border-dashed border-stone-400 hover:border-solid hover:border-stone-900 pb-0.5 transition-all group">
+                                Learn about our API
+                                <iconify-icon
+                                    class="text-sm group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
+                                    icon="solar:arrow-right-up-linear"></iconify-icon>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Forms & Badges -->
+                <div class="p-8 md:p-16">
+                    <h3
+                        class="text-sm font-mono font-bold uppercase tracking-widest text-stone-900 mb-10 border-b border-stone-200 pb-4 reveal">
+                        Forms, Tooltips & Badges</h3>
+
+                    <div class="space-y-10">
+                        <!-- Input field -->
+                        <div class="reveal delay-100 flex flex-col gap-2">
+                            <label class="text-xs font-semibold uppercase tracking-widest text-stone-500">Email
+                                Address</label>
+                            <div class="relative group">
+                                <iconify-icon
+                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within:text-blue-600 transition-colors text-xl"
+                                    icon="solar:letter-line-duotone"></iconify-icon>
+                                <input type="email" placeholder="design@system.com"
+                                    class="w-full pl-12 pr-4 py-3.5 bg-stone-50 border border-stone-200 rounded-xl outline-none focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-600/10 transition-all text-sm font-medium text-stone-900 placeholder:text-stone-400 shadow-inner" />
+                            </div>
+                        </div>
+
+                        <!-- Badges -->
+                        <div class="reveal delay-200">
+                            <label
+                                class="text-xs font-semibold uppercase tracking-widest text-stone-500 mb-3 block">States
+                                / Badges</label>
+                            <div class="flex flex-wrap gap-3">
+                                <span
+                                    class="px-3 py-1 bg-stone-900 text-white rounded text-[10px] font-bold uppercase tracking-widest">Padrão</span>
+                                <span
+                                    class="px-3 py-1 bg-white border border-stone-200 text-stone-600 rounded text-[10px] font-bold uppercase tracking-widest shadow-sm">Outline</span>
+                                <span
+                                    class="px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Active
+                                </span>
+                                <span
+                                    class="px-3 py-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded text-[10px] font-bold uppercase tracking-widest shadow-md">
+                                    New
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Tooltip -->
+                        <div class="reveal delay-300 pt-2">
+                            <div
+                                class="tooltip-container inline-flex items-center gap-2 cursor-pointer border-b border-dashed border-stone-400 pb-1 text-sm font-semibold text-stone-700 hover:text-stone-900 transition-colors">
+                                Passe o mouse por tooltip
+                                <iconify-icon class="text-stone-400"
+                                    icon="solar:info-circle-line-duotone"></iconify-icon>
+
+                                <!-- Tooltip Box -->
+                                <div
+                                    class="tooltip-box w-56 p-4 bg-stone-900 text-white text-xs font-light leading-relaxed rounded-xl shadow-2xl z-50 text-center">
+                                    Essencial para exibir regras de senhas, hints de contexto e detalhes em tabelas
+                                    fechadas.
+                                    <div
+                                        class="absolute top-full left-1/2 -translate-x-1/2 border-solid border-t-stone-900 border-t-[6px] border-x-transparent border-x-[6px] border-b-0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cards Showcase Full width -->
+            <div class="p-8 md:p-16 border-t border-stone-200">
+                <h3
+                    class="text-sm font-mono font-bold uppercase tracking-widest text-stone-900 mb-10 border-b border-stone-200 pb-4 reveal">
+                    Flashlight Cards & Modals</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch pt-4">
+
+                    <!-- Flashlight Interactive Card -->
+                    <div class="flashlight-card col-span-1 rounded-[2rem] p-8 flex flex-col justify-between shadow-sm hover:shadow-xl transition-shadow reveal delay-100"
+                        onmousemove="const rect = this.getBoundingClientRect(); this.style.setProperty('--mouse-x', `${event.clientX - rect.left}px`); this.style.setProperty('--mouse-y', `${event.clientY - rect.top}px`);">
+
+                        <div
+                            class="w-14 h-14 bg-white border border-stone-200 shadow-sm rounded-2xl flex items-center justify-center mb-8 hover:scale-110 transition-transform duration-500">
+                            <iconify-icon class="text-2xl text-stone-900"
+                                icon="solar:pie-chart-2-line-duotone"></iconify-icon>
+                        </div>
+                        <div>
+                            <h4 class="text-2xl font-bold tracking-tight text-stone-900 mb-3">Live Interactions</h4>
+                            <p class="text-stone-500 text-sm leading-relaxed mb-6">Inspirado nos guias de animações.
+                                Mova o cursor por este card e veja a iluminação "flashlight" nativa reagindo sobre a
+                                superfície cinza e o background.</p>
+                            <a href="#"
+                                class="text-xs font-bold uppercase tracking-widest text-stone-900 font-mono inline-flex items-center gap-2 group border-b border-stone-900 pb-1">
+                                Ler Documentação <iconify-icon class="group-hover:translate-x-1 transition-transform"
+                                    icon="solar:arrow-right-linear"></iconify-icon>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Visual Section Card (Media) -->
+                    <div
+                        class="flashlight-card col-span-1 border-stone-200 bg-[url('templates/digital-architect.aura.build/assets/6c710de5-9712-4c8e-a7db-59ac54_b647957b5aa5.webp')] bg-cover bg-center rounded-[2rem] relative overflow-hidden flex flex-col justify-end reveal delay-200 group">
+                        <div class="absolute inset-0 bg-gradient-to-t from-stone-900/90 to-transparent"></div>
+                        <div
+                            class="relative z-10 p-8 transform group-hover:-translate-y-2 transition-transform duration-500">
+                            <span
+                                class="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest text-white inline-block mb-4 border border-white/30">Case
+                                Study</span>
+                            <h4 class="text-2xl font-bold tracking-tight text-white mb-2">Banking App</h4>
+                            <p class="text-stone-300 text-sm leading-relaxed font-light">Uma jornada reformulada.</p>
+                        </div>
+                        <!-- Bottom animated border line -->
+                        <div
+                            class="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500 z-10">
+                        </div>
+                    </div>
+
+                    <!-- Simulated Modal Dialog -->
+                    <div
+                        class="col-span-1 rounded-[2rem] bg-stone-200 relative overflow-hidden flex items-center justify-center p-8 reveal delay-300 group">
+                        <!-- Checkerboard or grid bg -->
+                        <div
+                            class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0ibm9uZSI+PC9yZWN0Pgo8Y2lyY2xlIGN4PSIyIiBjeT0iMiIgcj0iMSIgZmlsbD0iIzAwMCI+PC9jaXJjbGU+Cjwvc3ZnPg==')]">
+                        </div>
+
+                        <!-- Modal inner panel -->
+                        <div
+                            class="bg-white rounded-2xl p-6 w-full relative z-10 shadow-2xl transform group-hover:scale-105 transition-transform duration-500 text-center">
+                            <button
+                                class="absolute top-4 right-4 text-stone-400 hover:text-stone-900 transition-colors">
+                                <iconify-icon icon="solar:close-circle-line-duotone" class="text-xl"></iconify-icon>
+                            </button>
+                            <div
+                                class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-100">
+                                <iconify-icon class="text-3xl" icon="solar:info-circle-line-duotone"></iconify-icon>
+                            </div>
+                            <h4 class="text-lg font-bold text-stone-900 mb-2">Confirm Delete?</h4>
+                            <p class="text-xs text-stone-500 mb-6 font-light">Efeito de Modal (Glassmorphism + Scale)
+                                que entra por cima do overlay via CSS transition.</p>
+                            <div class="flex gap-2 w-full">
+                                <button
+                                    class="flex-1 py-3 bg-stone-100 text-stone-700 text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-stone-200 transition-colors">Cancel</button>
+                                <button
+                                    class="flex-1 py-3 bg-red-600 text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-red-700 transition-colors shadow-lg shadow-red-600/20">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 5) ICONS -->
+        <section id="icons" class="border-b border-stone-200 py-24 bg-white">
+            <div class="px-8 md:px-16 mb-16 reveal text-center">
+                <span
+                    class="text-xs font-mono uppercase text-stone-400 block mb-3 font-semibold tracking-wider">Interface
+                    04</span>
+                <h2 class="text-5xl md:text-6xl font-bold tracking-tight text-stone-900">Iconography Duotone</h2>
+            </div>
+
+            <div
+                class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-px bg-stone-100 border-y border-stone-100">
+                <!-- Generating icons with hover states -->
+                <div
+                    class="bg-white p-8 flex flex-col items-center justify-center gap-4 hover:bg-stone-50 transition-colors group cursor-pointer reveal">
+                    <iconify-icon icon="solar:home-smile-line-duotone"
+                        class="text-3xl text-stone-600 group-hover:text-stone-900 group-hover:scale-125 transition-all duration-300"></iconify-icon>
+                    <span class="text-[9px] uppercase font-mono tracking-widest text-stone-400">Home</span>
+                </div>
+                <div
+                    class="bg-white p-8 flex flex-col items-center justify-center gap-4 hover:bg-stone-50 transition-colors group cursor-pointer reveal delay-100">
+                    <iconify-icon icon="solar:widget-3-line-duotone"
+                        class="text-3xl text-stone-600 group-hover:text-stone-900 group-hover:scale-125 transition-all duration-300"></iconify-icon>
+                    <span class="text-[9px] uppercase font-mono tracking-widest text-stone-400">Dash</span>
+                </div>
+                <div
+                    class="bg-white p-8 flex flex-col items-center justify-center gap-4 hover:bg-stone-50 transition-colors group cursor-pointer reveal delay-200">
+                    <iconify-icon icon="solar:users-group-two-rounded-line-duotone"
+                        class="text-3xl text-stone-600 group-hover:text-stone-900 group-hover:scale-125 transition-all duration-300"></iconify-icon>
+                    <span class="text-[9px] uppercase font-mono tracking-widest text-stone-400">Users</span>
+                </div>
+                <div
+                    class="bg-white p-8 flex flex-col items-center justify-center gap-4 hover:bg-stone-50 transition-colors group cursor-pointer reveal delay-300">
+                    <iconify-icon icon="solar:wallet-money-line-duotone"
+                        class="text-3xl text-stone-600 group-hover:text-stone-900 group-hover:scale-125 transition-all duration-300"></iconify-icon>
+                    <span class="text-[9px] uppercase font-mono tracking-widest text-stone-400">Wallet</span>
+                </div>
+                <div
+                    class="bg-white p-8 flex flex-col items-center justify-center gap-4 hover:bg-stone-50 transition-colors group cursor-pointer reveal delay-400">
+                    <iconify-icon icon="solar:chat-round-dots-line-duotone"
+                        class="text-3xl text-stone-600 group-hover:text-stone-900 group-hover:scale-125 transition-all duration-300"></iconify-icon>
+                    <span class="text-[9px] uppercase font-mono tracking-widest text-stone-400">Chat</span>
+                </div>
+                <div
+                    class="bg-white p-8 flex flex-col items-center justify-center gap-4 hover:bg-stone-50 transition-colors group cursor-pointer reveal delay-500">
+                    <iconify-icon icon="solar:settings-bold-duotone"
+                        class="text-3xl text-stone-600 group-hover:text-stone-900 group-hover:scale-125 transition-all duration-300"></iconify-icon>
+                    <span class="text-[9px] uppercase font-mono tracking-widest text-stone-400">Settings</span>
+                </div>
+                <div
+                    class="bg-white p-8 flex flex-col items-center justify-center gap-4 hover:bg-stone-50 transition-colors group cursor-pointer reveal delay-600">
+                    <iconify-icon icon="solar:bell-bing-line-duotone"
+                        class="text-3xl text-stone-600 group-hover:text-stone-900 group-hover:scale-125 transition-all duration-300"></iconify-icon>
+                    <span class="text-[9px] uppercase font-mono tracking-widest text-stone-400">Alerts</span>
+                </div>
+                <!-- Highlighted AI Icon -->
+                <div
+                    class="bg-blue-50/50 p-8 flex flex-col items-center justify-center gap-4 hover:bg-blue-50 transition-colors group cursor-pointer reveal delay-700">
+                    <iconify-icon icon="solar:magic-stick-3-bold-duotone"
+                        class="text-3xl text-blue-500 group-hover:text-blue-600 group-hover:scale-125 transition-all duration-300 animate-pulse"></iconify-icon>
+                    <span class="text-[9px] uppercase font-mono tracking-widest text-blue-600 font-bold">Magic AI</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6) MOTION -->
+        <section id="motion" class="relative overflow-hidden bg-stone-900 text-white pt-24 pb-32">
+            <!-- Background effects -->
+            <div class="absolute inset-0 bg-grid opacity-10 mix-blend-overlay"></div>
+            <div
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-600/20 rounded-full blur-[100px] pointer-events-none">
+            </div>
+
+            <div class="px-8 md:px-16 text-center reveal relative z-10 mb-20">
+                <span
+                    class="text-xs font-mono uppercase tracking-widest text-stone-400 block mb-3 font-semibold">Interface
+                    05</span>
+                <h2 class="text-5xl md:text-7xl font-bold tracking-tight text-white mb-6">Motion & Micro-interactions
+                </h2>
+                <p class="text-stone-400 font-light text-lg max-w-2xl mx-auto leading-relaxed">
+                    Movimento construído acima de física da mola e bezier cúbico (Cubic Bezier: 0.16, 1, 0.3, 1).
+                    Asseguramos que o movimento sempre responda imediatamente ao input do usuário.
+                </p>
+            </div>
+
+            <!-- Interactivity Simulator -->
+            <div
+                class="max-w-3xl mx-auto bg-white/5 border border-white/10 rounded-[2rem] p-8 md:p-12 backdrop-blur-xl reveal delay-200 relative z-10 shadow-2xl">
+                <div class="flex flex-col md:flex-row gap-12 items-center justify-between">
+
+                    <div class="flex-1 space-y-6 w-full">
+                        <div class="flex items-center gap-4">
+                            <span
+                                class="px-2 py-1 bg-white/10 rounded text-[10px] font-mono text-white">Transition</span>
+                            <div class="h-1 bg-white/10 rounded-full flex-1 overflow-hidden relative">
+                                <div
+                                    class="absolute inset-y-0 left-0 bg-blue-500 w-full transform -translate-x-full animate-[shimmer_2s_infinite]">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="px-2 py-1 bg-white/10 rounded text-[10px] font-mono text-white">Scale
+                                X/Y</span>
+                            <div class="h-1 bg-white/10 rounded-full flex-1 overflow-hidden relative">
+                                <div
+                                    class="absolute inset-y-0 left-0 bg-blue-500 w-full transform -translate-x-full animate-[shimmer_2s_infinite_0.4s]">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-8 border-t border-white/10 pt-6">
+                            <p class="text-sm font-mono text-stone-400">&gt; Cubic Bezier Function applied to active
+                                states.</p>
+                        </div>
+                    </div>
+
+                    <div class="relative w-32 h-32 flex-shrink-0 group cursor-pointer">
+                        <div
+                            class="absolute inset-0 rounded-full border border-dashed border-white/20 group-hover:rotate-180 transition-transform duration-1000 ease-in-out">
+                        </div>
+                        <div
+                            class="absolute inset-2 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-3xl rotate-12 group-hover:rotate-0 group-hover:scale-110 group-hover:rounded-full transition-all duration-700 ease-out flex items-center justify-center shadow-[0_0_40px_rgba(79,70,229,0.4)]">
+                            <iconify-icon icon="solar:star-fall-bold-duotone"
+                                class="text-3xl text-white"></iconify-icon>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Huge Watermark Text inside section -->
+            <div class="mt-24 text-center overflow-hidden reveal delay-400 relative z-0">
+                <span
+                    class="text-[5rem] md:text-[10rem] font-bold tracking-tighter leading-none text-white/5 uppercase select-none whitespace-nowrap">
+                    ANIMATIONS
+                </span>
+            </div>
+        </section>
+
+    </div> <!-- End Content Wrapper -->
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-stone-200 py-16 text-center">
+        <div class="flex flex-col items-center">
+            <iconify-icon icon="solar:code-circle-line-duotone" class="text-4xl text-stone-300 mb-6"></iconify-icon>
+            <p class="font-mono text-sm tracking-widest text-stone-500 uppercase font-bold mb-2">Design System V14.0</p>
+            <p class="text-xs text-stone-400 font-medium">Rebuilt with complete Tailored Setup & Absolute Paths</p>
+        </div>
+    </footer>
+
+    <!-- INTERACTION LOGIC / JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Header Entrance
+            setTimeout(() => {
+                document.querySelector('header').classList.add('loaded');
+            }, 100);
+
+            // Hero Title Entrance
+            setTimeout(() => {
+                document.querySelectorAll('#hero-title .text-reveal-wrapper').forEach(el => {
+                    el.classList.add('reveal-active');
+                });
+            }, 300);
+
+            // Intersection Observer Setup for general reveals
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // Sub-elements text reveal specific trigger
+                        const wrappers = entry.target.querySelectorAll('.text-reveal-wrapper, h1, h2, h3');
+                        if (entry.target.classList.contains('text-reveal-wrapper')) {
+                            entry.target.classList.add('reveal-active');
+                        }
+                        wrappers.forEach(w => w.classList.add('reveal-active'));
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+            // Setup Flashlight Effect
+            document.querySelectorAll('.flashlight-card').forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+                    card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+                });
+            });
+
+            // Very simple Parallax
+            window.addEventListener('scroll', () => {
+                const scrolled = window.scrollY;
+                document.querySelectorAll('.parallax-img').forEach(el => {
+                    const speed = el.dataset.speed || 0.1;
+                    el.style.transform = `translateY(${scrolled * speed}px)`;
+                });
+            });
+
+        });
+    </script>
+</body>
+
+</html>
